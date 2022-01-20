@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"google.golang.org/protobuf/proto"
-	"log"
 	"net"
 	"uno/protos"
 )
@@ -21,30 +20,30 @@ func (r *HumanPlayer) send(protoName string, message proto.Message) {
 	var byteBuffer bytes.Buffer
 	buf, err := proto.Marshal(message)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatal(err)
 	}
 	buff := make([]byte, 2)
 	binary.BigEndian.PutUint16(buff, uint16(len(protoName)+len(buf)+2))
 	_, err = byteBuffer.Write(buff)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatal(err)
 	}
 	binary.BigEndian.PutUint16(buff, uint16(len(protoName)))
 	_, err = byteBuffer.Write(buff)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatal(err)
 	}
 	_, err = byteBuffer.Write([]byte(protoName))
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatal(err)
 	}
 	_, err = byteBuffer.Write(buf)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatal(err)
 	}
 	_, err = r.Connection.Write(byteBuffer.Bytes())
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatal(err)
 	}
 }
 
@@ -65,7 +64,7 @@ func (r *HumanPlayer) Recv() {
 		nameLen := binary.BigEndian.Uint16(buf[:2])
 		protoName := string(buf[2 : 2+nameLen])
 		if protoName != "discard_card_tos" {
-			log.Println("错误的协议", protoName)
+			logger.Info("错误的协议", protoName)
 		} else {
 			msg := &protos.DiscardCardTos{}
 			err = proto.Unmarshal(buf[2+nameLen:], msg)
@@ -76,7 +75,7 @@ func (r *HumanPlayer) Recv() {
 				r.isTurn = false
 				r.cardChan <- msg
 			} else {
-				log.Println("还没到你出牌的回合")
+				logger.Info("还没到你出牌的回合")
 			}
 		}
 	}
@@ -163,11 +162,11 @@ func (r *HumanPlayer) AskForDiscardCard() (*Card, uint32) {
 		}
 		card, ok := r.cards[msg.GetCardId()]
 		if !ok {
-			log.Println("你没有这张牌")
+			logger.Info("你没有这张牌")
 			continue
 		}
 		if !card.CanPlay(r.game.LastCard, r.game.WantColor) {
-			log.Println("你不能出这张牌")
+			logger.Info("你不能出这张牌")
 			continue
 		}
 		if card.Color == 0 && card.Num == 14 {
@@ -179,12 +178,12 @@ func (r *HumanPlayer) AskForDiscardCard() (*Card, uint32) {
 				}
 			}
 			if !canPlay {
-				log.Println("你还有其他牌可以出，不能出+4")
+				logger.Info("你还有其他牌可以出，不能出+4")
 				continue
 			}
 		}
 		if card.Color == 0 && (msg.GetWantColor() > 4 || msg.GetWantColor() < 1) {
-			log.Println("你选的颜色不对")
+			logger.Info("你选的颜色不对")
 			continue
 		}
 		delete(r.cards, msg.GetCardId())

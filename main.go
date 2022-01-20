@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net"
 	"time"
 )
@@ -17,20 +16,22 @@ type Game struct {
 }
 
 func main() {
-	listen, err := net.Listen("tcp", ":9091")
+	listen, err := net.Listen("tcp", config.GetString("listen_address"))
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatalln(err)
 	}
 
 	game := &Game{
 		Dir:              true,
-		TotalPlayerCount: 4,
+		TotalPlayerCount: config.GetUint32("player.total_count"),
 		Deck:             NewDeck(),
 	}
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < config.GetInt("player.robot_count"); i++ {
 		game.Players = append(game.Players, new(RobotPlayer))
 	}
+
+	logger.Infof("已加入%d个机器人，等待%d人加入。。。", game.TotalPlayerCount, int(game.TotalPlayerCount)-len(game.Players))
 
 	for i := 0; i < int(game.TotalPlayerCount)-len(game.Players); i++ {
 		conn, err := listen.Accept()
@@ -68,12 +69,12 @@ func main() {
 		game.NotifyTurn()
 		playerCard, wantColor := game.Players[game.WhoseTurn].AskForDiscardCard()
 		if playerCard == nil {
-			log.Printf("%d号玩家不出牌\n", game.WhoseTurn)
+			logger.Infof("%d号玩家不出牌", game.WhoseTurn)
 			game.AddHandCard(1)
 		} else {
 			game.DiscardCard(game.WhoseTurn, *playerCard, wantColor)
 			if game.Players[game.WhoseTurn].IsWin() {
-				log.Printf("%d号玩家获胜\n", game.WhoseTurn)
+				logger.Infof("%d号玩家获胜", game.WhoseTurn)
 				break
 			}
 			switch playerCard.Num {
@@ -97,7 +98,7 @@ func main() {
 func (game *Game) AddHandCard(count int) {
 	card := game.Deck.Draw(count)
 	game.NotifyDeckNum()
-	log.Printf("%d号玩家摸了%d张牌\n", game.WhoseTurn, count)
+	logger.Infof("%d号玩家摸了%d张牌", game.WhoseTurn, count)
 	game.Players[game.WhoseTurn].NotifyAddHandCard(card...)
 	for id, player := range game.Players {
 		if uint32(id) != game.WhoseTurn {
@@ -117,9 +118,9 @@ func (game *Game) NextPlayer() {
 
 func (game *Game) DiscardCard(playerId uint32, card Card, wantColor uint32) {
 	if card.Color == 0 && wantColor != 0 {
-		log.Printf("%d号玩家打出%s，并选择%s\n", playerId, card.String(), GetColorString(wantColor))
+		logger.Printf("%d号玩家打出%s，并选择%s", playerId, card.String(), GetColorString(wantColor))
 	} else {
-		log.Printf("%d号玩家打出%s\n", playerId, card.String())
+		logger.Printf("%d号玩家打出%s", playerId, card.String())
 	}
 	game.LastCard = card
 	game.WantColor = wantColor
