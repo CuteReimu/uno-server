@@ -23,12 +23,6 @@ func (e *errorEntryWithStack) WithError(err error) *logrus.Entry {
 }
 
 func init() {
-	config = viper.New()
-	config.SetConfigName("config")
-	config.SetConfigType("yaml")
-	config.AddConfigPath(".")
-	err := config.ReadInConfig()
-
 	writerError, err := rotatelogs.New(
 		path.Join("logs", "error-%Y-%m-%d.log"),
 		rotatelogs.WithMaxAge(7*24*time.Hour),
@@ -63,4 +57,13 @@ func init() {
 			logrus.PanicLevel: writerConsole,
 		}, &logrus.TextFormatter{DisableQuote: true},
 	))
+
+	config = viper.New()
+	config.SetConfigName("config")
+	config.SetConfigType("yaml")
+	config.AddConfigPath(".")
+	err = config.ReadInConfig()
+	if err != nil {
+		logger.WithError(err).Fatalln("unable to write logs")
+	}
 }
