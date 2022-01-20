@@ -1,4 +1,4 @@
 listen_address: "127.0.0.1:9091"  # 监听的IP和端口
 player:
   total_count: 4  # 总人数
-  robot_count: 4  # 机器人人数
+  robot_count: 3  # 机器人人数
