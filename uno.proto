@@ -1,0 +1,50 @@
+syntax = "proto3";
+option go_package = "protos/;protos"; 
+
+// 卡牌的结构体
+message uno_card {
+	uint32 card_id = 1; // 卡牌ID
+	uint32 color = 2; // 1、2、3、4代表四种颜色，你爱用哪个用哪个，等价的。0代表黑牌
+	uint32 num = 3; // 0-9是数字牌 10代表“跳过”牌 11代表“反向”牌 12代表“+2牌” 13代表黑牌中的变色牌 14代表黑牌中的“+4”牌
+}
+
+// 通知客户端：初始化游戏
+message init_toc {
+	uint32 player_num = 1; // 玩家总人数（包括你）
+	repeated uno_card cards = 2; // 你的初始手牌
+}
+
+// 通知客户端：其他玩家摸牌
+message other_add_hand_card_toc {
+	uint32 player_id = 1; // 玩家ID 你的下家是1 下下家是2 以此类推
+	uint32 num = 2; // 增加的手牌数量
+}
+
+// 通知客户端：你摸牌
+message draw_card_toc {
+	repeated uno_card card = 1;
+}
+
+// 通知客户端：现在到谁的回合了
+message notify_turn_toc {
+	uint32 player_id = 1; // 玩家ID 你是0 你的下家是1 下下家是2 以此类推
+	bool dir = 2; // true-顺时针 false-逆时针
+}
+
+// 通知客户端：牌堆剩余数量（如果变多了，说明洗牌了）
+message set_deck_num_toc {
+	uint32 num = 1;
+}
+
+// 出牌
+message discard_card_tos {
+	uint32 card_id = 1; // 出的牌的ID
+	uint32 want_color = 2; // 出黑牌时，选择想要的颜色
+}
+
+// 通知客户端：某玩家出牌（自己出牌后，服务端也会返回这个协议）
+message discard_card_toc {
+	uint32 player_id = 1; // 玩家ID 你是0 你的下家是1 下下家是2 以此类推
+	uno_card card = 2;
+	uint32 want_color = 3; // 出黑牌时，选择想要的颜色
+}
