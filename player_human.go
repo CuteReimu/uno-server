@@ -10,7 +10,6 @@ import (
 )
 
 type HumanPlayer struct {
-	lastCard   Card
 	game       *Game
 	cards      map[uint32]Card
 	Connection net.Conn
