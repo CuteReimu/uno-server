@@ -1,0 +1,3 @@
+Jiaozze/uno:
+  - source: uno.proto
+    dest: UnoClient/Assets/Scripts/Proto/uno.proto
