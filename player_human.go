@@ -23,6 +23,7 @@ type HumanPlayer struct {
 func (r *HumanPlayer) Init(game *Game, beginHandCard []Card) {
 	r.game = game
 	r.cards = make(map[uint32]Card)
+	r.cardChan = make(chan *protos.DiscardCardTos)
 	msg := &protos.InitToc{
 		PlayerNum: game.TotalPlayerCount,
 	}
