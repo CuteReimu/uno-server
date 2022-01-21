@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net"
 	"time"
 )
 
@@ -16,37 +15,27 @@ type Game struct {
 }
 
 func main() {
-	listen, err := net.Listen("tcp", config.GetString("listen_address"))
-	if err != nil {
-		logger.Fatalln(err)
-	}
-
+	totalCount := config.GetUint32("player.total_count")
+	robotCount := config.GetUint32("player.robot_count")
+	humanCount := totalCount - robotCount
 	game := &Game{
 		Dir:              true,
-		TotalPlayerCount: config.GetUint32("player.total_count"),
+		TotalPlayerCount: totalCount,
 		Deck:             NewDeck(),
 	}
 
-	for i := 0; i < config.GetInt("player.robot_count"); i++ {
+	index := uint32(0)
+	for ; index < robotCount; index++ {
 		game.Players = append(game.Players, new(RobotPlayer))
 	}
+	logger.Infof("已加入%d个机器人，等待%d人加入。。。", robotCount, humanCount)
 
-	logger.Infof("已加入%d个机器人，等待%d人加入。。。", game.TotalPlayerCount, int(game.TotalPlayerCount)-len(game.Players))
-
-	for i := 0; i < int(game.TotalPlayerCount)-len(game.Players); i++ {
-		conn, err := listen.Accept()
-		if err != nil {
-			panic(err)
-		}
-		player := &HumanPlayer{Connection: conn}
-		go player.Recv()
-		game.Players = append(game.Players, player)
-	}
+	game.Players = append(game.Players, StartListen(humanCount)...)
 
 	for _, player := range game.Players {
 		cards := game.Deck.Draw(7)
 		player.Init(game, cards)
-		for i := uint32(1); i < game.TotalPlayerCount; i++ {
+		for i := uint32(1); i < totalCount; i++ {
 			player.NotifyOtherAddHandCard(i, 7)
 		}
 	}

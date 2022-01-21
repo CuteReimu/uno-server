@@ -23,6 +23,8 @@ func (e *errorEntryWithStack) WithError(err error) *logrus.Entry {
 }
 
 func init() {
+	logger.SetReportCaller(true)
+
 	config = viper.New()
 	config.SetConfigName("config")
 	config.SetConfigType("yaml")
