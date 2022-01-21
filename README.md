@@ -4,12 +4,10 @@
 
 联动客户端代码Uno-Client：[github.com/Jiaozze/uno](https://github.com/Jiaozze/uno)
 
-## 运行
-
-1. 按你的需要修改config.yaml配置文件
-
-2. 执行以下命令
+## 编译
 
 ```bash
-go run ./...
+go build -o "uno-server.exe"
 ```
+
+编译后，会生成一个`.exe`文件。按你的需要修改config.yaml配置文件后，双击`.exe`文件即可运行
