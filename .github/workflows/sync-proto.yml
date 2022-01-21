@@ -5,6 +5,8 @@ on:
       - master
     paths:
       - '**.proto'
+  workflow_dispatch:
+
 jobs:
   sync:
     runs-on: ubuntu-latest

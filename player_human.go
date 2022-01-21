@@ -1,84 +1,23 @@
 package main
 
 import (
-	"bytes"
-	"encoding/binary"
-	"google.golang.org/protobuf/proto"
-	"net"
+	"github.com/davyxu/cellnet"
+	"github.com/davyxu/cellnet/peer"
+	_ "github.com/davyxu/cellnet/peer/tcp"
+	"github.com/davyxu/cellnet/proc"
+	_ "github.com/davyxu/cellnet/proc/tcp"
+	"os"
+	"time"
 	"uno/protos"
+	_ "uno/tcp"
 )
 
 type HumanPlayer struct {
-	game       *Game
-	cards      map[uint32]Card
-	Connection net.Conn
-	isTurn     bool
-	cardChan   chan *protos.DiscardCardTos
-}
-
-func (r *HumanPlayer) send(protoName string, message proto.Message) {
-	var byteBuffer bytes.Buffer
-	buf, err := proto.Marshal(message)
-	if err != nil {
-		logger.Fatal(err)
-	}
-	buff := make([]byte, 2)
-	binary.BigEndian.PutUint16(buff, uint16(len(protoName)+len(buf)+2))
-	_, err = byteBuffer.Write(buff)
-	if err != nil {
-		logger.Fatal(err)
-	}
-	binary.BigEndian.PutUint16(buff, uint16(len(protoName)))
-	_, err = byteBuffer.Write(buff)
-	if err != nil {
-		logger.Fatal(err)
-	}
-	_, err = byteBuffer.Write([]byte(protoName))
-	if err != nil {
-		logger.Fatal(err)
-	}
-	_, err = byteBuffer.Write(buf)
-	if err != nil {
-		logger.Fatal(err)
-	}
-	_, err = r.Connection.Write(byteBuffer.Bytes())
-	if err != nil {
-		logger.Fatal(err)
-	}
-}
-
-func (r *HumanPlayer) Recv() {
-	r.cardChan = make(chan *protos.DiscardCardTos)
-	for {
-		buff := make([]byte, 2)
-		_, err := r.Connection.Read(buff)
-		if err != nil {
-			panic(err)
-		}
-		totalLen := binary.BigEndian.Uint16(buff)
-		buf := make([]byte, totalLen)
-		n, err := r.Connection.Read(buf)
-		if err != nil || n != int(totalLen) {
-			panic(err)
-		}
-		nameLen := binary.BigEndian.Uint16(buf[:2])
-		protoName := string(buf[2 : 2+nameLen])
-		if protoName != "discard_card_tos" {
-			logger.Info("错误的协议", protoName)
-		} else {
-			msg := &protos.DiscardCardTos{}
-			err = proto.Unmarshal(buf[2+nameLen:], msg)
-			if err != nil {
-				panic(err)
-			}
-			if r.isTurn {
-				r.isTurn = false
-				r.cardChan <- msg
-			} else {
-				logger.Info("还没到你出牌的回合")
-			}
-		}
-	}
+	game  *Game
+	cards map[uint32]Card
+	cellnet.Session
+	isTurn   bool
+	cardChan chan *protos.DiscardCardTos
 }
 
 func (r *HumanPlayer) Init(game *Game, beginHandCard []Card) {
@@ -96,7 +35,7 @@ func (r *HumanPlayer) Init(game *Game, beginHandCard []Card) {
 			Num:    num,
 		})
 	}
-	r.send("init_toc", msg)
+	r.Send(msg)
 }
 
 func (r *HumanPlayer) NotifyAddHandCard(cards ...Card) {
@@ -110,7 +49,7 @@ func (r *HumanPlayer) NotifyAddHandCard(cards ...Card) {
 			Num:    num,
 		})
 	}
-	r.send("draw_card_toc", msg)
+	r.Send(msg)
 }
 
 func (r *HumanPlayer) NotifyOtherAddHandCard(playerId uint32, num uint32) {
@@ -118,7 +57,7 @@ func (r *HumanPlayer) NotifyOtherAddHandCard(playerId uint32, num uint32) {
 		PlayerId: playerId,
 		Num:      num,
 	}
-	r.send("other_add_hand_card_toc", msg)
+	r.Send(msg)
 }
 
 func (r *HumanPlayer) NotifyDeckNum() {
@@ -126,7 +65,7 @@ func (r *HumanPlayer) NotifyDeckNum() {
 	msg := &protos.SetDeckNumToc{
 		Num: length,
 	}
-	r.send("set_deck_num_toc", msg)
+	r.Send(msg)
 }
 
 func (r *HumanPlayer) NotifyDiscardCard(playerId uint32, card Card, wantColor uint32) {
@@ -142,7 +81,7 @@ func (r *HumanPlayer) NotifyDiscardCard(playerId uint32, card Card, wantColor ui
 		},
 		WantColor: wantColor,
 	}
-	r.send("discard_card_toc", msg)
+	r.Send(msg)
 }
 
 func (r *HumanPlayer) NotifyTurn(playerId uint32, dir bool) {
@@ -150,7 +89,7 @@ func (r *HumanPlayer) NotifyTurn(playerId uint32, dir bool) {
 		PlayerId: playerId,
 		Dir:      dir,
 	}
-	r.send("notify_turn_toc", msg)
+	r.Send(msg)
 }
 
 func (r *HumanPlayer) AskForDiscardCard() (*Card, uint32) {
@@ -193,4 +132,52 @@ func (r *HumanPlayer) AskForDiscardCard() (*Card, uint32) {
 
 func (r *HumanPlayer) IsWin() bool {
 	return len(r.cards) == 0
+}
+
+func StartListen(humanCount uint32) (players []IPlayer) {
+	// 创建一个事件处理队列，整个服务器只有这一个队列处理事件，服务器属于单线程服务器
+	queue := cellnet.NewEventQueue()
+
+	// 创建一个tcp的侦听器，名称为server，所有连接将事件投递到queue队列,单线程的处理
+	p := peer.NewGenericPeer("tcp.Acceptor", "server", config.GetString("listen_address"), queue)
+
+	humanMap := make(map[int64]*HumanPlayer)
+	var index uint32
+	ch := make(chan struct{})
+	proc.BindProcessorHandler(p, "tcp.ltv", func(ev cellnet.Event) {
+		switch msg := ev.Message().(type) {
+		case *cellnet.SessionAccepted:
+			if index < humanCount {
+				player := &HumanPlayer{Session: ev.Session()}
+				players = append(players, player)
+				humanMap[player.Session.ID()] = player
+				index++
+				logger.Info("server accepted", player.Session)
+				if index == humanCount {
+					ch <- struct{}{}
+				}
+			} else {
+				ev.Session().Close()
+				logger.Info("房间人数已满")
+			}
+		case *cellnet.SessionClosed:
+			logger.Info("session closed: ", ev.Session().ID())
+			logger.Info("目前不支持断线重连，程序将在3秒后关闭")
+			time.Sleep(time.Second * 3)
+			os.Exit(1)
+		case *protos.DiscardCardTos:
+			r := humanMap[ev.Session().ID()]
+			if r.isTurn {
+				r.isTurn = false
+				r.cardChan <- msg
+			} else {
+				logger.Info("还没到你出牌的回合")
+			}
+		}
+	})
+	p.Start()
+	queue.StartLoop()
+	//queue.Wait()
+	<-ch
+	return
 }
