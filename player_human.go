@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/davyxu/cellnet"
+	"github.com/davyxu/cellnet/msglog"
 	"github.com/davyxu/cellnet/peer"
 	_ "github.com/davyxu/cellnet/peer/tcp"
 	"github.com/davyxu/cellnet/proc"
@@ -140,6 +141,9 @@ func (r *HumanPlayer) NotifyWin(playerId uint32) {
 }
 
 func StartListen(humanCount uint32) (players []IPlayer) {
+	if !config.GetBool("log.tcp_debug_log") {
+		msglog.SetCurrMsgLogMode(msglog.MsgLogMode_Mute)
+	}
 	// 创建一个事件处理队列，整个服务器只有这一个队列处理事件，服务器属于单线程服务器
 	queue := cellnet.NewEventQueue()
 
