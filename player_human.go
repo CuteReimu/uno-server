@@ -135,6 +135,10 @@ func (r *HumanPlayer) IsWin() bool {
 	return len(r.cards) == 0
 }
 
+func (r *HumanPlayer) NotifyWin(playerId uint32) {
+	r.Send(&protos.NotifyWinToc{PlayerId: playerId})
+}
+
 func StartListen(humanCount uint32) (players []IPlayer) {
 	// 创建一个事件处理队列，整个服务器只有这一个队列处理事件，服务器属于单线程服务器
 	queue := cellnet.NewEventQueue()

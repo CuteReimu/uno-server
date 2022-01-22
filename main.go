@@ -64,6 +64,7 @@ func main() {
 			game.DiscardCard(game.WhoseTurn, *playerCard, wantColor)
 			if game.Players[game.WhoseTurn].IsWin() {
 				logger.Infof("%d号玩家获胜", game.WhoseTurn)
+				game.NotifyWin()
 				break
 			}
 			switch playerCard.Num {
@@ -81,6 +82,7 @@ func main() {
 		}
 		game.NextPlayer()
 	}
+	logger.Info("程序将在10秒后退出")
 	time.Sleep(10 * time.Second)
 }
 
@@ -134,5 +136,11 @@ func (game *Game) NotifyDeckNum() {
 func (game *Game) NotifyTurn() {
 	for playerId, player := range game.Players {
 		player.NotifyTurn((game.WhoseTurn+game.TotalPlayerCount-uint32(playerId))%game.TotalPlayerCount, game.Dir)
+	}
+}
+
+func (game *Game) NotifyWin() {
+	for playerId, player := range game.Players {
+		player.NotifyWin((game.WhoseTurn + game.TotalPlayerCount - uint32(playerId)) % game.TotalPlayerCount)
 	}
 }

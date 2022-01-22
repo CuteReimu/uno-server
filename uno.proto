@@ -48,3 +48,8 @@ message discard_card_toc {
   uno_card card = 2;
   uint32 want_color = 3; // 出黑牌时，选择想要的颜色
 }
+
+// 通知客户端谁赢了
+message notify_win_toc {
+  uint32 player_id = 1; // 玩家ID 你是0 你的下家是1 下下家是2 以此类推
+}

@@ -11,6 +11,7 @@ type IPlayer interface {
 	NotifyTurn(playerId uint32, dir bool)
 	AskForDiscardCard() (*Card, uint32)
 	IsWin() bool
+	NotifyWin(playerId uint32)
 }
 
 type RobotPlayer struct {
@@ -78,6 +79,9 @@ func (r *RobotPlayer) AskForDiscardCard() (*Card, uint32) {
 
 func (r *RobotPlayer) IsWin() bool {
 	return len(r.cards) == 0
+}
+
+func (r *RobotPlayer) NotifyWin(uint32) {
 }
 
 func (r *RobotPlayer) getMaxNumColor() uint32 {
