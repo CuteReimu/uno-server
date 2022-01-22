@@ -171,9 +171,11 @@ func StartListen(humanCount uint32) (players []IPlayer) {
 			}
 		case *cellnet.SessionClosed:
 			logger.Info("session closed: ", ev.Session().ID())
-			logger.Info("目前不支持断线重连，程序将在3秒后关闭")
-			time.Sleep(time.Second * 3)
-			os.Exit(1)
+			if _, ok := humanMap[ev.Session().ID()]; ok {
+				logger.Info("目前不支持断线重连，程序将在3秒后关闭")
+				time.Sleep(time.Second * 3)
+				os.Exit(1)
+			}
 		case *protos.DiscardCardTos:
 			r := humanMap[ev.Session().ID()]
 			if r.isTurn {
@@ -187,6 +189,8 @@ func StartListen(humanCount uint32) (players []IPlayer) {
 	p.Start()
 	queue.StartLoop()
 	//queue.Wait()
-	<-ch
+	if humanCount > 0 {
+		<-ch
+	}
 	return
 }
