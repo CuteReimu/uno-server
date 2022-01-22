@@ -1,13 +1,13 @@
-package tcp
+package core
 
 import (
+	_ "github.com/CuteReimu/uno/protos"
 	"github.com/davyxu/cellnet"
 	"github.com/davyxu/cellnet/util"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
 	"reflect"
-	_ "uno/protos"
 )
 
 type protoCodec struct {

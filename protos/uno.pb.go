@@ -516,6 +516,45 @@ func (x *NotifyWinToc) GetPlayerId() uint32 {
 	return 0
 }
 
+// 重开
+type RestartGameTos struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *RestartGameTos) Reset() {
+	*x = RestartGameTos{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_uno_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RestartGameTos) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RestartGameTos) ProtoMessage() {}
+
+func (x *RestartGameTos) ProtoReflect() protoreflect.Message {
+	mi := &file_uno_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RestartGameTos.ProtoReflect.Descriptor instead.
+func (*RestartGameTos) Descriptor() ([]byte, []int) {
+	return file_uno_proto_rawDescGZIP(), []int{9}
+}
+
 var File_uno_proto protoreflect.FileDescriptor
 
 var file_uno_proto_rawDesc = []byte{
@@ -558,8 +597,9 @@ var file_uno_proto_rawDesc = []byte{
 	0x72, 0x22, 0x2d, 0x0a, 0x0e, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x79, 0x5f, 0x77, 0x69, 0x6e, 0x5f,
 	0x74, 0x6f, 0x63, 0x12, 0x1b, 0x0a, 0x09, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x5f, 0x69, 0x64,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x08, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x49, 0x64,
-	0x42, 0x10, 0x5a, 0x0e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2f, 0x3b, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x22, 0x12, 0x0a, 0x10, 0x72, 0x65, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x67, 0x61, 0x6d, 0x65,
+	0x5f, 0x74, 0x6f, 0x73, 0x42, 0x10, 0x5a, 0x0e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2f, 0x3b,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -574,7 +614,7 @@ func file_uno_proto_rawDescGZIP() []byte {
 	return file_uno_proto_rawDescData
 }
 
-var file_uno_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_uno_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_uno_proto_goTypes = []interface{}{
 	(*UnoCard)(nil),             // 0: uno_card
 	(*InitToc)(nil),             // 1: init_toc
@@ -585,6 +625,7 @@ var file_uno_proto_goTypes = []interface{}{
 	(*DiscardCardTos)(nil),      // 6: discard_card_tos
 	(*DiscardCardToc)(nil),      // 7: discard_card_toc
 	(*NotifyWinToc)(nil),        // 8: notify_win_toc
+	(*RestartGameTos)(nil),      // 9: restart_game_tos
 }
 var file_uno_proto_depIdxs = []int32{
 	0, // 0: init_toc.cards:type_name -> uno_card
@@ -711,6 +752,18 @@ func file_uno_proto_init() {
 				return nil
 			}
 		}
+		file_uno_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RestartGameTos); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -718,7 +771,7 @@ func file_uno_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_uno_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

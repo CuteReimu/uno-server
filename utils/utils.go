@@ -1,21 +1,20 @@
-package main
+package utils
 
 import (
 	"fmt"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"path"
 	"time"
 )
 
-var config *viper.Viper
-
-var logger = &errorEntryWithStack{logrus.New()}
+func GetLogger(module string) logrus.FieldLogger {
+	return &errorEntryWithStack{logrus.WithField("module", module)}
+}
 
 type errorEntryWithStack struct {
-	*logrus.Logger
+	*logrus.Entry
 }
 
 func (e *errorEntryWithStack) WithError(err error) *logrus.Entry {
@@ -23,16 +22,7 @@ func (e *errorEntryWithStack) WithError(err error) *logrus.Entry {
 }
 
 func init() {
-	logger.SetReportCaller(true)
-
-	config = viper.New()
-	config.SetConfigName("config")
-	config.SetConfigType("yaml")
-	config.AddConfigPath(".")
-	err := config.ReadInConfig()
-	if err != nil {
-		logrus.WithError(err).Fatalln("unable to write logs")
-	}
+	logrus.SetReportCaller(true)
 
 	writerError, err := rotatelogs.New(
 		path.Join("logs", "error-%Y-%m-%d.log"),
@@ -40,9 +30,9 @@ func init() {
 		rotatelogs.WithRotationTime(24*time.Hour),
 	)
 	if err != nil {
-		logger.WithError(err).Fatalln("unable to write logs")
+		logrus.WithError(err).Fatalln("unable to write logs")
 	}
-	logger.AddHook(lfshook.NewHook(
+	logrus.AddHook(lfshook.NewHook(
 		lfshook.WriterMap{
 			logrus.WarnLevel:  writerError,
 			logrus.ErrorLevel: writerError,
@@ -57,9 +47,9 @@ func init() {
 		rotatelogs.WithRotationTime(24*time.Hour),
 	)
 	if err != nil {
-		logger.WithError(err).Fatalln("unable to write logs")
+		logrus.WithError(err).Fatalln("unable to write logs")
 	}
-	logger.AddHook(lfshook.NewHook(
+	logrus.AddHook(lfshook.NewHook(
 		lfshook.WriterMap{
 			logrus.InfoLevel:  writerConsole,
 			logrus.WarnLevel:  writerConsole,
