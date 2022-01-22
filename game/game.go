@@ -99,7 +99,6 @@ func (game *Game) Start(totalCount, robotCount int) {
 		game.Post(game.start)
 	}
 	game.Wait()
-	return
 }
 
 func (game *Game) start() {

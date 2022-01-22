@@ -145,13 +145,6 @@ func (p *basePlayer) Draw(count int) {
 	}
 }
 
-func (p *basePlayer) draw(count int) {
-	cards := p.game.Deck.Draw(count)
-	for _, card := range cards {
-		p.cards[card.Id()] = card
-	}
-}
-
 type RobotPlayer struct {
 	basePlayer
 }
