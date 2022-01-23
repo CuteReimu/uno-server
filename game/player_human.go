@@ -1,7 +1,7 @@
 package game
 
 import (
-	"github.com/CuteReimu/uno/protos"
+	"github.com/CuteReimu/uno-server/protos"
 	"github.com/davyxu/cellnet"
 )
 

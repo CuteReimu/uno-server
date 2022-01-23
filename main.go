@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/CuteReimu/uno/config"
-	"github.com/CuteReimu/uno/game"
+	"github.com/CuteReimu/uno-server/config"
+	"github.com/CuteReimu/uno-server/game"
 )
 
 func main() {
