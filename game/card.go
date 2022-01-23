@@ -228,7 +228,7 @@ func (c *cardPlus4) CanPlay(game *Game, player IPlayer, args ...uint32) bool {
 	}
 	canPlay := true
 	player.ForeachCards(func(card ICard) bool {
-		if _, ok := card.(*cardPlus4); !ok && card.CanPlay(game, player) {
+		if _, ok := card.(*cardPlus4); !ok && card.CanPlay(game, player, args...) {
 			canPlay = false
 			return false
 		}
