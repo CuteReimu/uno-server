@@ -2,8 +2,8 @@
 
 这是一个Uno的服务端代码
 
-联动客户端代码Unity版本：[github.com/Jiaozze/uno](https://github.com/Jiaozze/uno)
-联动客户端代码Go版本：[github.com/CuteReimu/uno-client](https://github.com/CuteReimu/uno-client)
+- 联动客户端代码Unity版本：[github.com/Jiaozze/uno](https://github.com/Jiaozze/uno)
+- 联动客户端代码Go版本：[github.com/CuteReimu/uno-client](https://github.com/CuteReimu/uno-client)
 
 ## 编译
 
