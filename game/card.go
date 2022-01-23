@@ -68,7 +68,7 @@ func newNumberCard(id, color, num uint32) ICard {
 }
 
 func (c *numberCard) CanPlay(game *Game, _ IPlayer, _ ...uint32) bool {
-	if game.WantColor == 0 {
+	if game.WantColor == ColorBlack {
 		return true
 	}
 	return game.WantColor == c.Color() || game.LastCard.Number() == c.Number()
@@ -97,7 +97,7 @@ func newSkipCard(id, color uint32) ICard {
 }
 
 func (c *cardSkip) CanPlay(game *Game, _ IPlayer, _ ...uint32) bool {
-	if game.WantColor == 0 {
+	if game.WantColor == ColorBlack {
 		return true
 	}
 	return game.WantColor == c.Color() || game.LastCard.Number() == c.Number()
@@ -126,7 +126,7 @@ func newReverseCard(id, color uint32) ICard {
 }
 
 func (c *cardReverse) CanPlay(game *Game, _ IPlayer, _ ...uint32) bool {
-	if game.WantColor == 0 {
+	if game.WantColor == ColorBlack {
 		return true
 	}
 	return game.WantColor == c.Color() || game.LastCard.Number() == c.Number()
@@ -156,7 +156,7 @@ func newPlus2Card(id, color uint32) ICard {
 }
 
 func (c *cardPlus2) CanPlay(game *Game, _ IPlayer, _ ...uint32) bool {
-	if game.WantColor == 0 {
+	if game.WantColor == ColorBlack {
 		return true
 	}
 	return game.WantColor == c.Color() || game.LastCard.Number() == c.Number()
