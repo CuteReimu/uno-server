@@ -210,7 +210,7 @@ func (c *cardWild) Color() Color {
 }
 
 func (c *cardWild) Number() uint32 {
-	return 12
+	return 13
 }
 
 type cardPlus4 struct {
@@ -253,7 +253,7 @@ func (c *cardPlus4) Color() Color {
 }
 
 func (c *cardPlus4) Number() uint32 {
-	return 12
+	return 14
 }
 
 type Deck struct {
