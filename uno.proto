@@ -11,7 +11,6 @@ message uno_card {
 // 通知客户端：初始化游戏
 message init_toc {
   uint32 player_num = 1; // 玩家总人数（包括你）
-  repeated uno_card cards = 2; // 你的初始手牌
 }
 
 // 通知客户端：其他玩家摸牌
