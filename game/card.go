@@ -58,33 +58,33 @@ func (c *colorfulCard) Color() Color {
 	return c.color
 }
 
-type NumberCard struct {
+type numberCard struct {
 	colorfulCard
 	num uint32
 }
 
 func newNumberCard(id, color, num uint32) ICard {
-	return &NumberCard{colorfulCard{baseCard{id}, Color(color)}, num}
+	return &numberCard{colorfulCard{baseCard{id}, Color(color)}, num}
 }
 
-func (c *NumberCard) CanPlay(game *Game, _ IPlayer, _ ...uint32) bool {
+func (c *numberCard) CanPlay(game *Game, _ IPlayer, _ ...uint32) bool {
 	if game.WantColor == 0 {
 		return true
 	}
 	return game.WantColor == c.Color() || game.LastCard.Number() == c.Number()
 }
 
-func (c *NumberCard) Execute(game *Game, _ IPlayer, _ ...uint32) {
+func (c *numberCard) Execute(game *Game, _ IPlayer, _ ...uint32) {
 	game.LastCard = c
 	game.WantColor = c.Color()
 	game.NextPlayer(1)
 }
 
-func (c *NumberCard) Number() uint32 {
+func (c *numberCard) Number() uint32 {
 	return c.num
 }
 
-func (c *NumberCard) String() string {
+func (c *numberCard) String() string {
 	return c.Color().String() + strconv.Itoa(int(c.Number()))
 }
 
