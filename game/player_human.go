@@ -1,7 +1,7 @@
 package game
 
 import (
-	"github.com/CuteReimu/uno/protos"
+	"github.com/CuteReimu/uno-server/protos"
 	"github.com/davyxu/cellnet"
 )
 
@@ -14,14 +14,6 @@ func (r *HumanPlayer) Init(game *Game, location int) {
 	r.basePlayer.Init(game, location)
 	msg := &protos.InitToc{
 		PlayerNum: uint32(r.game.TotalPlayerCount),
-	}
-	for _, card := range r.cards {
-		r.cards[card.Id()] = card
-		msg.Cards = append(msg.Cards, &protos.UnoCard{
-			CardId: card.Id(),
-			Color:  uint32(card.Color()),
-			Num:    card.Number(),
-		})
 	}
 	r.Send(msg)
 }

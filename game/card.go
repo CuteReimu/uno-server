@@ -58,33 +58,33 @@ func (c *colorfulCard) Color() Color {
 	return c.color
 }
 
-type NumberCard struct {
+type numberCard struct {
 	colorfulCard
 	num uint32
 }
 
 func newNumberCard(id, color, num uint32) ICard {
-	return &NumberCard{colorfulCard{baseCard{id}, Color(color)}, num}
+	return &numberCard{colorfulCard{baseCard{id}, Color(color)}, num}
 }
 
-func (c *NumberCard) CanPlay(game *Game, _ IPlayer, _ ...uint32) bool {
-	if game.WantColor == 0 {
+func (c *numberCard) CanPlay(game *Game, _ IPlayer, _ ...uint32) bool {
+	if game.WantColor == ColorBlack {
 		return true
 	}
 	return game.WantColor == c.Color() || game.LastCard.Number() == c.Number()
 }
 
-func (c *NumberCard) Execute(game *Game, _ IPlayer, _ ...uint32) {
+func (c *numberCard) Execute(game *Game, _ IPlayer, _ ...uint32) {
 	game.LastCard = c
 	game.WantColor = c.Color()
 	game.NextPlayer(1)
 }
 
-func (c *NumberCard) Number() uint32 {
+func (c *numberCard) Number() uint32 {
 	return c.num
 }
 
-func (c *NumberCard) String() string {
+func (c *numberCard) String() string {
 	return c.Color().String() + strconv.Itoa(int(c.Number()))
 }
 
@@ -97,7 +97,7 @@ func newSkipCard(id, color uint32) ICard {
 }
 
 func (c *cardSkip) CanPlay(game *Game, _ IPlayer, _ ...uint32) bool {
-	if game.WantColor == 0 {
+	if game.WantColor == ColorBlack {
 		return true
 	}
 	return game.WantColor == c.Color() || game.LastCard.Number() == c.Number()
@@ -126,7 +126,7 @@ func newReverseCard(id, color uint32) ICard {
 }
 
 func (c *cardReverse) CanPlay(game *Game, _ IPlayer, _ ...uint32) bool {
-	if game.WantColor == 0 {
+	if game.WantColor == ColorBlack {
 		return true
 	}
 	return game.WantColor == c.Color() || game.LastCard.Number() == c.Number()
@@ -156,7 +156,7 @@ func newPlus2Card(id, color uint32) ICard {
 }
 
 func (c *cardPlus2) CanPlay(game *Game, _ IPlayer, _ ...uint32) bool {
-	if game.WantColor == 0 {
+	if game.WantColor == ColorBlack {
 		return true
 	}
 	return game.WantColor == c.Color() || game.LastCard.Number() == c.Number()
@@ -210,7 +210,7 @@ func (c *cardWild) Color() Color {
 }
 
 func (c *cardWild) Number() uint32 {
-	return 12
+	return 13
 }
 
 type cardPlus4 struct {
@@ -228,7 +228,7 @@ func (c *cardPlus4) CanPlay(game *Game, player IPlayer, args ...uint32) bool {
 	}
 	canPlay := true
 	player.ForeachCards(func(card ICard) bool {
-		if _, ok := card.(*cardPlus4); !ok && card.CanPlay(game, player) {
+		if _, ok := card.(*cardPlus4); !ok && card.CanPlay(game, player, args...) {
 			canPlay = false
 			return false
 		}
@@ -253,7 +253,7 @@ func (c *cardPlus4) Color() Color {
 }
 
 func (c *cardPlus4) Number() uint32 {
-	return 12
+	return 14
 }
 
 type Deck struct {

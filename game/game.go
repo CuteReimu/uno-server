@@ -1,10 +1,10 @@
 package game
 
 import (
-	"github.com/CuteReimu/uno/config"
-	_ "github.com/CuteReimu/uno/core"
-	"github.com/CuteReimu/uno/protos"
-	"github.com/CuteReimu/uno/utils"
+	"github.com/CuteReimu/uno-server/config"
+	_ "github.com/CuteReimu/uno-server/core"
+	"github.com/CuteReimu/uno-server/protos"
+	"github.com/CuteReimu/uno-server/utils"
 	"github.com/davyxu/cellnet"
 	"github.com/davyxu/cellnet/msglog"
 	"github.com/davyxu/cellnet/peer"

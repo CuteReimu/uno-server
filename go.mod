@@ -1,4 +1,4 @@
-module github.com/CuteReimu/uno
+module github.com/CuteReimu/uno-server
 
 go 1.17
 

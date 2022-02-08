@@ -1,7 +1,7 @@
 package core
 
 import (
-	_ "github.com/CuteReimu/uno/protos"
+	_ "github.com/CuteReimu/uno-server/protos"
 	"github.com/davyxu/cellnet"
 	"github.com/davyxu/cellnet/util"
 	"google.golang.org/protobuf/proto"
