@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -84,16 +85,16 @@ func (p *basePlayer) PlayCard(cardId uint32, args ...uint32) {
 			player.NotifyDiscardCard(p.location, card, args...)
 		}
 		if card.Color() == ColorBlack && p.game.WantColor != ColorBlack {
-			logger.Infof("%d号玩家打出%s，并选择%s", p.location, card.String(), p.game.WantColor.String())
+			logger.Info(fmt.Sprintf("%d号玩家打出%s，并选择%s", p.location, card, p.game.WantColor))
 		} else {
-			logger.Infof("%d号玩家打出%s", p.location, card.String())
+			logger.Info(fmt.Sprintf("%d号玩家打出%s", p.location, card))
 		}
 		if p.IsWin() {
-			logger.Infof("%d号玩家获胜", p.location)
+			logger.Info(fmt.Sprintf("%d号玩家获胜", p.location))
 			for _, player := range p.game.Players {
 				player.NotifyWin(p.location)
 			}
-			logger.Infof("游戏将在10秒后重新开始。。。")
+			logger.Info("游戏将在10秒后重新开始。。。")
 			time.AfterFunc(time.Second*10, func() {
 				p.game.Post(func() {
 					if p.IsWin() {
@@ -133,7 +134,7 @@ func (p *basePlayer) Draw(count int) {
 	for _, card := range cards {
 		p.cards[card.Id()] = card
 	}
-	logger.Infof("%d号玩家摸了%d张牌, 现在还有%d张牌", p.location, count, len(p.cards))
+	logger.Info(fmt.Sprintf("%d号玩家摸了%d张牌, 现在还有%d张牌", p.location, count, len(p.cards)))
 	for _, player := range p.game.Players {
 		if player.Location() == p.Location() {
 			player.NotifyDeckNum(len(p.game.Deck.cards))
