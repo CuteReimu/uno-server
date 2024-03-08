@@ -3,59 +3,40 @@ package utils
 import (
 	"fmt"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
-	"github.com/rifflock/lfshook"
-	"github.com/sirupsen/logrus"
+	"log/slog"
 	"path"
 	"time"
 )
 
-func GetLogger(module string) logrus.FieldLogger {
-	return &errorEntryWithStack{logrus.WithField("module", module)}
-}
-
-type errorEntryWithStack struct {
-	*logrus.Entry
-}
-
-func (e *errorEntryWithStack) WithError(err error) *logrus.Entry {
-	return e.Logger.WithError(fmt.Errorf("%+v", err))
+func GetLogger(module string) *slog.Logger {
+	return slog.With("module", module)
 }
 
 func init() {
-	logrus.SetReportCaller(true)
-
 	writerError, err := rotatelogs.New(
 		path.Join("logs", "error-%Y-%m-%d.log"),
 		rotatelogs.WithMaxAge(7*24*time.Hour),
 		rotatelogs.WithRotationTime(24*time.Hour),
 	)
 	if err != nil {
-		logrus.WithError(err).Fatalln("unable to write logs")
+		slog.Error("unable to write logs", "error", err)
+		return
 	}
-	logrus.AddHook(lfshook.NewHook(
-		lfshook.WriterMap{
-			logrus.WarnLevel:  writerError,
-			logrus.ErrorLevel: writerError,
-			logrus.FatalLevel: writerError,
-			logrus.PanicLevel: writerError,
-		}, &logrus.TextFormatter{DisableQuote: true},
-	))
 
-	writerConsole, err := rotatelogs.New(
-		path.Join("logs", "console-%Y-%m-%d.log"),
-		rotatelogs.WithMaxAge(7*24*time.Hour),
-		rotatelogs.WithRotationTime(24*time.Hour),
-	)
-	if err != nil {
-		logrus.WithError(err).Fatalln("unable to write logs")
-	}
-	logrus.AddHook(lfshook.NewHook(
-		lfshook.WriterMap{
-			logrus.InfoLevel:  writerConsole,
-			logrus.WarnLevel:  writerConsole,
-			logrus.ErrorLevel: writerConsole,
-			logrus.FatalLevel: writerConsole,
-			logrus.PanicLevel: writerConsole,
-		}, &logrus.TextFormatter{DisableQuote: true},
-	))
+	slog.SetDefault(slog.New(slog.NewTextHandler(writerError, &slog.HandlerOptions{
+		AddSource: true,
+		Level:     slog.LevelInfo,
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			switch a.Key {
+			case slog.TimeKey:
+				if t, ok := a.Value.Any().(time.Time); ok {
+					a.Value = slog.StringValue(t.Format("15:04:05.000"))
+				}
+			default:
+				if e, ok := a.Value.Any().(error); ok {
+					a.Value = slog.StringValue(fmt.Sprintf("%+v", e))
+				}
+			}
+			return a
+		}})))
 }

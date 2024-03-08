@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/sirupsen/logrus"
+	"fmt"
 	"github.com/spf13/viper"
+	"log/slog"
 )
 
 var GlobalConfig *viper.Viper
@@ -14,6 +15,7 @@ func init() {
 	GlobalConfig.AddConfigPath(".")
 	err := GlobalConfig.ReadInConfig()
 	if err != nil {
-		logrus.WithError(err).Fatalln("unable to write logs")
+		slog.Error("unable to write logs", "error", err)
+		panic(fmt.Sprintf("unable to write logs, error: %+v", err))
 	}
 }

@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"github.com/CuteReimu/uno-server/config"
 	_ "github.com/CuteReimu/uno-server/core"
 	"github.com/CuteReimu/uno-server/protos"
@@ -49,7 +50,7 @@ func (game *Game) Start(totalCount, robotCount int) {
 	for ; index < robotCount; index++ {
 		game.Players = append(game.Players, new(RobotPlayer))
 	}
-	logger.Infof("已加入%d个机器人，等待%d人加入。。。", robotCount, humanCount)
+	logger.Info(fmt.Sprintf("已加入%d个机器人，等待%d人加入。。。", robotCount, humanCount))
 
 	if !config.GlobalConfig.GetBool("log.tcp_debug_log") {
 		msglog.SetCurrMsgLogMode(msglog.MsgLogMode_Mute)
