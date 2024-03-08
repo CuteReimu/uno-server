@@ -79,7 +79,7 @@ func (game *Game) Start(totalCount, robotCount int) {
 				logger.Info("房间人数已满")
 			}
 		case *cellnet.SessionClosed:
-			logger.Info("session closed: ", ev.Session().ID())
+			logger.Info("session closed", "sessionId", ev.Session().ID())
 			if _, ok := humanMap[ev.Session().ID()]; ok {
 				logger.Info("目前不支持断线重连，程序将在3秒后关闭")
 				time.Sleep(time.Second * 3)
