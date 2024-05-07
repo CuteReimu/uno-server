@@ -106,7 +106,7 @@ func (p *basePlayer) PlayCard(cardId uint32, args ...uint32) {
 		}
 		card.Execute(p.game, p, args...)
 	} else {
-		logger.Error("你不能打这张牌", card)
+		logger.Error(fmt.Sprint("你不能打这张牌", card))
 	}
 }
 

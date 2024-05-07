@@ -70,7 +70,7 @@ func (game *Game) Start(totalCount, robotCount int) {
 				game.Players = append(game.Players, player)
 				humanMap[player.Session.ID()] = player
 				index++
-				logger.Info("server accepted", player.Session)
+				logger.Info("server accepted", "sessionId", ev.Session().ID())
 				if index == totalCount {
 					game.Post(game.start)
 				}
@@ -112,7 +112,7 @@ func (game *Game) start() {
 		player.Draw(7)
 	}
 	cards := game.Deck.Draw(1)
-	logger.Info("翻出了", cards[0])
+	logger.Info(fmt.Sprint("翻出了", cards[0]))
 	for _, player := range game.Players {
 		player.NotifyDeckNum(len(game.Deck.cards))
 		player.NotifyDiscardCard(99999, cards[0], 0)
