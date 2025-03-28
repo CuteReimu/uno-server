@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/davyxu/cellnet v4.1.0+incompatible
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
-	github.com/spf13/viper v1.20.0
+	github.com/spf13/viper v1.20.1
 	google.golang.org/protobuf v1.36.6
 )
 
