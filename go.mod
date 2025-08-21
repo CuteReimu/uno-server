@@ -14,7 +14,7 @@ require (
 	github.com/davyxu/goobjfmt v0.1.0 // indirect
 	github.com/davyxu/protoplus v0.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
-	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
+	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/lestrrat-go/strftime v1.0.6 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
